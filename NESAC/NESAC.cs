@@ -169,8 +169,7 @@ namespace NESAC
             openMsbFile(fileName);
 
             // TODO: attempt to load label files
-            string labelFileName = fileName.Split(new char[] { (char)"."[0] })[0];
-            //labelFileName = labelFileName.Replace(".msb", ".msl");
+            string labelFileName = Path.GetFileNameWithoutExtension(fileName);
             labelFileName += ".msl";
 
             openMsbLabels(labelFileName);
@@ -261,6 +260,8 @@ namespace NESAC
                 metaSprites.Add(new MetaSprite(i));
             }*/
 
+            string label_default = Path.GetFileNameWithoutExtension(fileName) + "_";
+
             byte[] metaspriteBytes = File.ReadAllBytes(fileName);
 
             int offset_x = (int)metaspriteBytes[0];
@@ -270,7 +271,8 @@ namespace NESAC
             {
                 int file_index = (i * 256) + 2;
 
-                MetaSprite metaSprite = new MetaSprite(i, "metasprite_" + i.ToString());
+                //MetaSprite metaSprite = new MetaSprite(i, "metasprite_" + i.ToString());
+                MetaSprite metaSprite = new MetaSprite(i, label_default + i.ToString());
 
                 if ((int)metaspriteBytes[file_index] != 255)
                 {
@@ -418,6 +420,12 @@ namespace NESAC
                 }
 
                 lstAnimations.SelectedIndex = SelAnimation;
+
+                exportAnimationsAsasmToolStripMenuItem.Enabled = true;
+            }
+            else
+            {
+                exportAnimationsAsasmToolStripMenuItem.Enabled = false;
             }
 
             lstAnimations.EndUpdate();
@@ -439,7 +447,13 @@ namespace NESAC
         {
             int timeDelay = (int)nudCelDefaultTimeDelay.Value;
             animations[SelAnimation].Add(new AnimationCel(SelMetaSpriteIndex, timeDelay));
+            SelAnimationCel = animations[SelAnimation].Count - 1;
             updateCelListBox();
+
+            // TODO> select newest frame.
+
+            //lstAnimationCels.SelectedIndex = animations[SelAnimation]
+
             renderSelectedAnimation();
 
             updateAnimationControls();
@@ -452,6 +466,7 @@ namespace NESAC
             animations.Add(a);
             txtAnimationNameBox.Text = name;
 
+            SelAnimation = animations.Count - 1;
             updateAnimationListBox();
 
             updateAnimationControls();
@@ -488,11 +503,9 @@ namespace NESAC
         private void lstAnimations_SelectedIndexChanged(object sender, EventArgs e)
         {
             SelAnimation = lstAnimations.SelectedIndex;
-            /*if(selAnimation < 0)
-            {
-                SelAnimation = 0;
-            }*/
+
             renderSelectedAnimation();
+
             updateCelListBox();
 
             updateAnimationControls();
@@ -513,8 +526,15 @@ namespace NESAC
             {
                 nudCelTimeDelay.Value = animations[SelAnimation][SelAnimationCel].TimeDelay;
 
-                nudLoopToFrame.Maximum = animations[SelAnimation].Count - 1;
-                nudLoopToFrame.Value = animations[SelAnimation].LoopToFrame;
+                int loop_max = animations[SelAnimation].Count - 1;
+                if (loop_max < 0)
+                    loop_max = 0;
+
+                int loop_to_frame = animations[SelAnimation].LoopToFrame;
+
+                nudLoopToFrame.Maximum = loop_max;
+
+                nudLoopToFrame.Value = loop_to_frame;
             }
         }
 
@@ -582,32 +602,37 @@ namespace NESAC
             }
 
             AnimationSequence a = animations[SelAnimation];
-            AnimationCel ac = a[SelAnimationCel];
 
-            if (ac.CountDown == 0)
+            if (a.Count > 0)
             {
-                if (animations[SelAnimation].Count - 1 == SelAnimationCel)
+                AnimationCel ac = a[SelAnimationCel];
+
+                if (ac.CountDown == 0)
                 {
-                    SelAnimationCel = animations[SelAnimation].LoopToFrame;
+                    if (animations[SelAnimation].Count - 1 == SelAnimationCel)
+                    {
+                        SelAnimationCel = animations[SelAnimation].LoopToFrame;
+                    }
+                    else
+                    {
+                        SelAnimationCel++;
+                    }
+
+                    ac.CountDown = ac.TimeDelay;
                 }
                 else
                 {
-                    SelAnimationCel++;
+                    ac.CountDown--;
                 }
 
-                ac.CountDown = ac.TimeDelay;
+
+
+
+                renderSelectedAnimation();
+                //updateCelListBox();
+
+                lstAnimationCels.SelectedIndex = SelAnimationCel;
             }
-            else
-            {
-                ac.CountDown--;
-            }
-
-
-
-            renderSelectedAnimation();
-            //updateCelListBox();
-
-            lstAnimationCels.SelectedIndex = SelAnimationCel;
         }
 
         private void btnAnimationsSave_Click(object sender, EventArgs e)
@@ -730,6 +755,50 @@ namespace NESAC
             {
                 btnAnimationPlay.PerformClick();
             }
+
+            if (e.Control)
+            {
+                if (e.KeyCode == Keys.OemOpenBrackets)
+                {
+                    btnPrev10Cel.PerformClick();
+                }
+                if (e.KeyCode == Keys.OemCloseBrackets)
+                {
+                    btnNext10Cel.PerformClick();
+                }
+            }
+            else
+            {
+                if (e.KeyCode == Keys.OemOpenBrackets)
+                {
+                    btnPrevCel.PerformClick();
+                }
+                if (e.KeyCode == Keys.OemCloseBrackets)
+                {
+                    btnNextCel.PerformClick();
+                }
+            }
+
+
+            //if (lstAnimationCels.Focused)
+            //{
+                if (e.Control)
+                {
+                    if (e.KeyCode == Keys.Left)
+                    {
+                        lstAnimations.Focus();
+
+                        e.Handled = true;
+                    }
+                    else if (e.KeyCode == Keys.Right)
+                    {
+                    lstAnimationCels.Focus();
+
+                        e.Handled = true;
+                    }
+                }
+            //}
+
         }
 
         private void pctMetaspriteBox_Click(object sender, EventArgs e)
@@ -765,7 +834,12 @@ namespace NESAC
                     lstAnimationCels.SelectedIndex = SelAnimationCel;
                 }
 
-                nudLoopToFrame.Maximum = animations[SelAnimation].Count - 1;
+                int loop_to_frame = animations[SelAnimation].Count - 1;
+                if (loop_to_frame < 0)
+                    loop_to_frame = 0;
+
+                // DANGEROUS
+                nudLoopToFrame.Maximum = loop_to_frame;
             }
 
             lstAnimationCels.EndUpdate();
@@ -1227,8 +1301,7 @@ namespace NESAC
             string fileName = exportAnimationToAsmDialog.FileName;
 
 
-            string animation_label = Path.GetFileName(fileName);
-            animation_label = animation_label.Split(new char[]{ (char)"."[0] })[0];
+            string animation_label = Path.GetFileNameWithoutExtension(fileName);
 
             string output_header = animation_label + ":\n";
             output_header += "\t@last_animation_index:\t.db " + (animations.Count - 1).ToString() + "\n\n";
@@ -1249,7 +1322,7 @@ namespace NESAC
 
                     output += "\t" + a.Label + ":\n";
 
-                    if (i == 0)
+                    if (i == 0 && a.Count > 1)
                     {
                         output += "\t\t.db " + length.ToString() + "\t; index of last frame starting from this byte.\n";
                         output += "\t\t.db " + loopToFrame.ToString() + "\t; index of frame to loop to * 3. If " + metaSprites[a[0].MetaSpriteIndex].Label + " is 0 and " + metaSprites[a[1].MetaSpriteIndex].Label + " is 1, then those would be 0 and 3." + "\n\n";
@@ -1334,6 +1407,70 @@ namespace NESAC
             renderSelectedAnimation();
 
             //updateAnimationControls();
+        }
+
+        private void lstAnimationCels_Enter(object sender, EventArgs e)
+        {
+            lstAnimationCels.BackColor = SystemColors.Window;
+        }
+
+        private void lstAnimationCels_Leave(object sender, EventArgs e)
+        {
+            lstAnimationCels.BackColor = SystemColors.AppWorkspace;
+        }
+
+        private void lstAnimations_Enter(object sender, EventArgs e)
+        {
+            lstAnimations.BackColor = SystemColors.Window;
+        }
+
+        private void lstAnimations_Leave(object sender, EventArgs e)
+        {
+            lstAnimations.BackColor = SystemColors.AppWorkspace;
+        }
+
+        private void lstAnimationCels_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            drawListBoxItem(sender, e, lstAnimationCels);
+        }
+
+        private void lstAnimations_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            drawListBoxItem(sender, e, lstAnimations);
+        }
+
+        private void drawListBoxItem(object sender, DrawItemEventArgs e, ListBox listBox)
+        {
+            if (e.Index < 0) return;
+
+            Color selected_color = SystemColors.ControlDarkDark;
+            Brush selected_font_color = Brushes.Black;
+
+            if (listBox.Focused)
+            {
+                selected_color = SystemColors.MenuHighlight;
+            }
+
+            //if the item state is selected them change the back color 
+            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+            {
+                e = new DrawItemEventArgs(e.Graphics,
+                                          e.Font,
+                                          e.Bounds,
+                                          e.Index,
+                                          e.State ^ DrawItemState.Selected,
+                                          e.ForeColor,
+                                          selected_color);//Choose the color
+
+                selected_font_color = Brushes.White;
+            }
+
+            // Draw the background of the ListBox control for each item.
+            e.DrawBackground();
+            // Draw the current item text
+            e.Graphics.DrawString(listBox.Items[e.Index].ToString(), e.Font, selected_font_color, e.Bounds, StringFormat.GenericDefault);
+            // If the ListBox has focus, draw a focus rectangle around the selected item.
+            e.DrawFocusRectangle();
         }
     }
 }

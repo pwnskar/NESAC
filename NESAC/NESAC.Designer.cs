@@ -82,6 +82,7 @@
             this.nudCelDefaultTimeDelay = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnEditMetasprite = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.pctFullPaletteBox = new System.Windows.Forms.PictureBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -97,7 +98,6 @@
             this.saveSessionDialog = new System.Windows.Forms.SaveFileDialog();
             this.openSessionDialog = new System.Windows.Forms.OpenFileDialog();
             this.exportAnimationToAsmDialog = new System.Windows.Forms.SaveFileDialog();
-            this.btnEditMetasprite = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pctChrTableBox)).BeginInit();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pctMetaspriteBox)).BeginInit();
@@ -289,6 +289,7 @@
             // 
             // exportAnimationsAsasmToolStripMenuItem
             // 
+            this.exportAnimationsAsasmToolStripMenuItem.Enabled = false;
             this.exportAnimationsAsasmToolStripMenuItem.Name = "exportAnimationsAsasmToolStripMenuItem";
             this.exportAnimationsAsasmToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.exportAnimationsAsasmToolStripMenuItem.Text = "Export animations as *.asm";
@@ -387,7 +388,7 @@
             this.btnInsertMetasprite.Location = new System.Drawing.Point(438, 19);
             this.btnInsertMetasprite.Name = "btnInsertMetasprite";
             this.btnInsertMetasprite.Size = new System.Drawing.Size(45, 23);
-            this.btnInsertMetasprite.TabIndex = 10;
+            this.btnInsertMetasprite.TabIndex = 26;
             this.btnInsertMetasprite.Text = "Add";
             this.btnInsertMetasprite.UseVisualStyleBackColor = true;
             this.btnInsertMetasprite.Click += new System.EventHandler(this.btnInsertMetasprite_Click);
@@ -398,7 +399,7 @@
             this.btnDelCel.Location = new System.Drawing.Point(543, 19);
             this.btnDelCel.Name = "btnDelCel";
             this.btnDelCel.Size = new System.Drawing.Size(58, 23);
-            this.btnDelCel.TabIndex = 17;
+            this.btnDelCel.TabIndex = 28;
             this.btnDelCel.Text = "Delete";
             this.btnDelCel.UseVisualStyleBackColor = true;
             this.btnDelCel.Click += new System.EventHandler(this.btnDelCel_Click);
@@ -409,7 +410,7 @@
             this.btnAnimationPlay.Location = new System.Drawing.Point(274, 308);
             this.btnAnimationPlay.Name = "btnAnimationPlay";
             this.btnAnimationPlay.Size = new System.Drawing.Size(61, 29);
-            this.btnAnimationPlay.TabIndex = 18;
+            this.btnAnimationPlay.TabIndex = 33;
             this.btnAnimationPlay.Text = ">";
             this.btnAnimationPlay.UseVisualStyleBackColor = true;
             this.btnAnimationPlay.Click += new System.EventHandler(this.btnAnimationPlay_Click);
@@ -422,23 +423,30 @@
             // 
             // lstAnimationCels
             // 
+            this.lstAnimationCels.BackColor = System.Drawing.SystemColors.Window;
+            this.lstAnimationCels.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.lstAnimationCels.Enabled = false;
             this.lstAnimationCels.Font = new System.Drawing.Font("Consolas", 8.25F);
+            this.lstAnimationCels.ForeColor = System.Drawing.SystemColors.WindowText;
             this.lstAnimationCels.FormattingEnabled = true;
             this.lstAnimationCels.Location = new System.Drawing.Point(438, 48);
             this.lstAnimationCels.Name = "lstAnimationCels";
             this.lstAnimationCels.Size = new System.Drawing.Size(163, 212);
-            this.lstAnimationCels.TabIndex = 20;
+            this.lstAnimationCels.TabIndex = 29;
+            this.lstAnimationCels.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lstAnimationCels_DrawItem);
             this.lstAnimationCels.SelectedIndexChanged += new System.EventHandler(this.lstAnimationCels_SelectedIndexChanged);
             // 
             // lstAnimations
             // 
+            this.lstAnimations.BackColor = System.Drawing.SystemColors.Window;
+            this.lstAnimations.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.lstAnimations.Font = new System.Drawing.Font("Consolas", 8.25F);
             this.lstAnimations.FormattingEnabled = true;
             this.lstAnimations.Location = new System.Drawing.Point(7, 48);
             this.lstAnimations.Name = "lstAnimations";
             this.lstAnimations.Size = new System.Drawing.Size(163, 251);
-            this.lstAnimations.TabIndex = 21;
+            this.lstAnimations.TabIndex = 24;
+            this.lstAnimations.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.lstAnimations_DrawItem);
             this.lstAnimations.SelectedIndexChanged += new System.EventHandler(this.lstAnimations_SelectedIndexChanged);
             // 
             // btnAddAnimation
@@ -483,7 +491,7 @@
             this.txtAnimationNameBox.MaxLength = 32;
             this.txtAnimationNameBox.Name = "txtAnimationNameBox";
             this.txtAnimationNameBox.Size = new System.Drawing.Size(163, 20);
-            this.txtAnimationNameBox.TabIndex = 26;
+            this.txtAnimationNameBox.TabIndex = 25;
             this.txtAnimationNameBox.TextChanged += new System.EventHandler(this.txtAnimationNameBox_TextChanged);
             this.txtAnimationNameBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtAnimationNameBox_KeyDown);
             // 
@@ -515,7 +523,7 @@
             0});
             this.nudCelTimeDelay.Name = "nudCelTimeDelay";
             this.nudCelTimeDelay.Size = new System.Drawing.Size(66, 20);
-            this.nudCelTimeDelay.TabIndex = 32;
+            this.nudCelTimeDelay.TabIndex = 30;
             this.nudCelTimeDelay.ValueChanged += new System.EventHandler(this.nudCelTimeDelay_ValueChanged);
             // 
             // nudLoopToFrame
@@ -528,7 +536,7 @@
             0});
             this.nudLoopToFrame.Name = "nudLoopToFrame";
             this.nudLoopToFrame.Size = new System.Drawing.Size(66, 20);
-            this.nudLoopToFrame.TabIndex = 34;
+            this.nudLoopToFrame.TabIndex = 31;
             this.nudLoopToFrame.ValueChanged += new System.EventHandler(this.nudLoopToFrame_ValueChanged);
             // 
             // label5
@@ -550,7 +558,7 @@
             0});
             this.nudCelDefaultTimeDelay.Name = "nudCelDefaultTimeDelay";
             this.nudCelDefaultTimeDelay.Size = new System.Drawing.Size(66, 20);
-            this.nudCelDefaultTimeDelay.TabIndex = 36;
+            this.nudCelDefaultTimeDelay.TabIndex = 32;
             this.nudCelDefaultTimeDelay.Value = new decimal(new int[] {
             1,
             0,
@@ -592,6 +600,17 @@
             this.groupBox1.TabIndex = 37;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Animations";
+            // 
+            // btnEditMetasprite
+            // 
+            this.btnEditMetasprite.Enabled = false;
+            this.btnEditMetasprite.Location = new System.Drawing.Point(489, 19);
+            this.btnEditMetasprite.Name = "btnEditMetasprite";
+            this.btnEditMetasprite.Size = new System.Drawing.Size(48, 23);
+            this.btnEditMetasprite.TabIndex = 27;
+            this.btnEditMetasprite.Text = "Edit";
+            this.btnEditMetasprite.UseVisualStyleBackColor = true;
+            this.btnEditMetasprite.Click += new System.EventHandler(this.btnEditMetasprite_Click);
             // 
             // groupBox2
             // 
@@ -732,17 +751,6 @@
             // 
             this.exportAnimationToAsmDialog.Filter = "Assembly files|*.asm|All files|*.*";
             this.exportAnimationToAsmDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.exportAnimationToAsmDialog_FileOk);
-            // 
-            // btnEditMetasprite
-            // 
-            this.btnEditMetasprite.Enabled = false;
-            this.btnEditMetasprite.Location = new System.Drawing.Point(489, 19);
-            this.btnEditMetasprite.Name = "btnEditMetasprite";
-            this.btnEditMetasprite.Size = new System.Drawing.Size(48, 23);
-            this.btnEditMetasprite.TabIndex = 37;
-            this.btnEditMetasprite.Text = "Edit";
-            this.btnEditMetasprite.UseVisualStyleBackColor = true;
-            this.btnEditMetasprite.Click += new System.EventHandler(this.btnEditMetasprite_Click);
             // 
             // NESAC
             // 

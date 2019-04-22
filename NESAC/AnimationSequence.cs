@@ -8,9 +8,25 @@ namespace NESAC
 {
     public class AnimationSequence : List<AnimationCel>
     {
+        private int loopToFrame = 0;
+
         public string Label = "";
-        public int LoopToFrame = 0;
         public int SelectedCel = 0;
+
+        public int LoopToFrame
+        {
+            get
+            {
+                return loopToFrame;
+            }
+
+            set
+            {
+                loopToFrame = value;
+            }
+                
+        }
+
 
         public AnimationSequence(string label)
         {
