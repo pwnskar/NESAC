@@ -8,7 +8,8 @@ namespace NESAC
 {
     class NESACSession
     {
-        public string ChrFilename = "";
+        public string ChrTableFilenameA = "";
+        public string ChrTableFilenameB = "";
         public string PalFilename = "";
         public string MsbFilename = "";
         public string AnimFilename = "";

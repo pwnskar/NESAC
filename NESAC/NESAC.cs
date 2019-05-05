@@ -15,6 +15,7 @@ namespace NESAC
     {
         private NESACSession Session = new NESACSession();
 
+        private bool chr8x16Mode = false;
 
         public bool animNameTextKeyIsDown = false;
 
@@ -24,12 +25,16 @@ namespace NESAC
         private int metaSpriteBitmapX = 256;
         private int metaSpriteBitmapY = 256;
 
-        public ChrTable chrTable = new ChrTable();
+        public ChrTable chrTables = new ChrTable();
         public NESPalette nesPalette = new NESPalette();
         public PaletteSelection paletteSelection = new PaletteSelection();
+        private int chrTablePaletteSelection = 0;
         //private int paletteSelectionIndex = 0;
 
         public MetaSpriteList metaSprites = new MetaSpriteList();
+        public int metaSprite_offset_X = 0;
+        public int metaSprite_offset_Y = 0;
+
         private int selMetaSpriteIndex = 0;
         public int SelMetaSpriteIndex
         {
@@ -202,16 +207,40 @@ namespace NESAC
 
         private void openChrFile(string fileName)
         {
+            if (chkChrTableA.Checked)
+                openChrFileA(fileName);
+            else
+                openChrFileB(fileName);
+
+            return;
+        }
+
+        private void openChrFileA(string fileName)
+        {
             if (!File.Exists(fileName))
                 return;
 
-            byte[] chrBytesA = File.ReadAllBytes(fileName);
+            byte[] chrBytes = File.ReadAllBytes(fileName);
 
-            chrTable = new ChrTable(chrBytesA);
+            chrTables.LoadA(chrBytes);
+
+            this.Session.ChrTableFilenameA = fileName;
 
             updateRenders();
+        }
 
-            this.Session.ChrFilename = fileName;
+        private void openChrFileB(string fileName)
+        {
+            if (!File.Exists(fileName))
+                return;
+
+            byte[] chrBytes = File.ReadAllBytes(fileName);
+
+            chrTables.LoadB(chrBytes);
+
+            this.Session.ChrTableFilenameB = fileName;
+
+            updateRenders();
         }
 
 
@@ -264,8 +293,8 @@ namespace NESAC
 
             byte[] metaspriteBytes = File.ReadAllBytes(fileName);
 
-            int offset_x = (int)metaspriteBytes[0];
-            int offset_y = (int)metaspriteBytes[1];
+            metaSprite_offset_X = (int)metaspriteBytes[0];
+            metaSprite_offset_Y = (int)metaspriteBytes[1];
 
             for (int i = 0; i < 256; i++)
             {
@@ -317,30 +346,37 @@ namespace NESAC
 
         private void renderChrTable()
         {
-            renderChrTable(0);
+            renderChrTable(chrTablePaletteSelection);
         }
 
         private void renderChrTable(int paletteSelectionIndex)
         {
+            if (chrTables.Count < 256)
+                return;
+
             Bitmap chrBitmapA = new Bitmap(128, 128);
             Graphics g = Graphics.FromImage(chrBitmapA);
             g.Clear(nesPalette[paletteSelection[0][0]]);
 
             int x_pos = 0;
 
-            for (int i = 0; i < chrTable.Count; i++)
+            int chrIndex = 0;
+            if (!chkChrTableA.Checked)
+                chrIndex = 256;
+
+            for (int i = 0; i < 256; i++)
             {
 
                 int y_pos = i / 16 * 8;
-
-
+                
                 if (x_pos > 8 * 15)
                 {
                     x_pos = 0;
                 }
 
 
-                Bitmap b = chrTable.GetBitmap(i, paletteSelection[paletteSelectionIndex], nesPalette);
+                Bitmap b = chrTables.GetBitmap(chrIndex, paletteSelection[paletteSelectionIndex], nesPalette, false);
+                chrIndex++;
 
                 g.DrawImage(b, x_pos, y_pos);
 
@@ -368,15 +404,17 @@ namespace NESAC
 
             if (metaSprites.Count > 0)
             {
-                renderMetasprite(metaSprites[SelMetaSpriteIndex]);
+                renderMetasprite();
             }
 
             lblMetaSpriteIndex.Text = "Metasprite " + SelMetaSpriteIndex.ToString();
             txtMetaspriteNameBox.Text = metaSprites[SelMetaSpriteIndex].Label;
         }
 
-        private void renderMetasprite(MetaSprite metaSprite)
+        private void renderMetasprite()
         {
+            MetaSprite metaSprite = metaSprites[SelMetaSpriteIndex];
+
             Bitmap metaSpriteBitmap = new Bitmap(128, 128);
             Graphics g = Graphics.FromImage(metaSpriteBitmap);
             g.Clear(nesPalette[paletteSelection[0][0]]);
@@ -385,7 +423,7 @@ namespace NESAC
             {
                 OamEntry o = metaSprite[i];
 
-                Bitmap b = chrTable.GetBitmap(o.Char, paletteSelection[o.GetPaletteIndex()], nesPalette);
+                Bitmap b = chrTables.GetBitmap(o.Char, paletteSelection[o.GetPaletteIndex()], nesPalette, chr8x16Mode);
                 if (o.VerticalIsFlipped())
                 {
                     b.RotateFlip(RotateFlipType.RotateNoneFlipY);
@@ -543,18 +581,7 @@ namespace NESAC
             SelAnimationCel = lstAnimationCels.SelectedIndex;     // redundant?
             animations[SelAnimation].RemoveAt(SelAnimationCel);
             updateCelListBox();
-            /*if (selAnimationCel > animations[SelAnimation].Count - 1)
-            {
-                selAnimationCel = animations[SelAnimation].Count - 1;
-            }
-            if (selAnimationCel < 0)
-            {
-                selAnimationCel = 0;
-            }
-            else
-            {
-                lstAnimationCels.SelectedIndex = selAnimationCel;
-            }*/
+
             if (animations[SelAnimation].Count > 0)
             {
                 lstAnimationCels.SelectedIndex = SelAnimationCel;
@@ -585,11 +612,7 @@ namespace NESAC
 
         private void btnAnimationPause_Click(object sender, EventArgs e)
         {
-            /*if (tmrAnimationTimer.Enabled)
-                tmrAnimationTimer.Enabled = false;
-            else
-                tmrAnimationTimer.Enabled = true;
-                */
+
             tmrAnimationTimer.Enabled = !tmrAnimationTimer.Enabled;
         }
 
@@ -857,7 +880,7 @@ namespace NESAC
                 if (animation.Count > 0)
                 {
                     AnimationCel ac = animation[SelAnimationCel];
-                    celBitmap = metaSprites[ac.MetaSpriteIndex].GetBitmap(nesPalette, paletteSelection, chrTable);
+                    celBitmap = metaSprites[ac.MetaSpriteIndex].GetBitmap(nesPalette, paletteSelection, chrTables, chr8x16Mode);
                 }
                 else
                 {
@@ -1244,11 +1267,12 @@ namespace NESAC
 
             string outputSb = "";
 
-            outputSb += Session.ChrFilename + "\n";
+            outputSb += Session.ChrTableFilenameA + "\n";
             outputSb += Session.PalFilename + "\n";
             outputSb += Session.MsbFilename + "\n";
             outputSb += Session.MsbLabelsFilename + "\n";
             outputSb += Session.AnimFilename + "\n";
+            outputSb += Session.ChrTableFilenameB + "\n";
 
             byte[] bytes = Encoding.ASCII.GetBytes(outputSb);
 
@@ -1275,13 +1299,15 @@ namespace NESAC
 
                 string[] result = converted.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-                Session.ChrFilename = result[0];
+                Session.ChrTableFilenameA = result[0];
                 Session.PalFilename = result[1];
                 Session.MsbFilename = result[2];
                 Session.MsbLabelsFilename = result[3];
                 Session.AnimFilename = result[4];
+                Session.ChrTableFilenameB = result[5];
 
-                openChrFile(Session.ChrFilename);
+                openChrFileA(Session.ChrTableFilenameA);
+                openChrFileB(Session.ChrTableFilenameB);
                 openPalFile(Session.PalFilename);
                 openMsbFile(Session.MsbFilename);
                 openMsbLabels(Session.MsbLabelsFilename);
@@ -1295,11 +1321,20 @@ namespace NESAC
             exportAnimationToAsmDialog.ShowDialog();
         }
 
+        private void exportAnimationsAsJSONToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            exportAnimationToJsonDialog.ShowDialog();
+        }
+
+        private void exportAnimationsAsCToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            exportAnimationToCDialog.ShowDialog();
+        }
+
         private void exportAnimationToAsmDialog_FileOk(object sender, CancelEventArgs e)
         {
 
             string fileName = exportAnimationToAsmDialog.FileName;
-
 
             string animation_label = Path.GetFileNameWithoutExtension(fileName);
 
@@ -1362,11 +1397,206 @@ namespace NESAC
             File.WriteAllBytes(fileName, bytes);
         }
 
+        private void exportAnimationToJsonDialog_FileOk(object sender, CancelEventArgs e)
+        {
+            string fileName = exportAnimationToJsonDialog.FileName;
+
+            string animation_label = Path.GetFileNameWithoutExtension(fileName);
+
+
+            string output = "{\n";
+
+            if (metaSprites.Count > 0)
+            {
+                output += "\t\"metasprite_offsets\": [" + metaSprite_offset_X.ToString() + ", " + metaSprite_offset_Y.ToString() + "],\n";
+
+                output += "\t\"metasprites\": [\n";
+
+                foreach (MetaSprite ms in metaSprites)
+                {
+
+                    if (ms.Count < 1)
+                        continue;
+
+                    if (metaSprites.IndexOf(ms) > 0)
+                        output += ",\n";
+
+                    output += "\t\t{\n";
+                    output += "\t\t\t\"label\": \"" + ms.Label + "\",\n";
+                    output += "\t\t\t\"oam_entries\": [\n";
+
+                    foreach (OamEntry oam in ms)
+                    {
+                        output += "\t\t\t\t" + oam.X.ToString() + ", " + oam.Y.ToString() + ", " + oam.Char.ToString() + ", " + oam.Attribute.ToString();
+
+                        if (ms.IndexOf(oam) < ms.Count - 1)
+                            output += ",\n";
+                    }
+
+                    output += "\n";
+                    output += "\t\t\t]\n";
+
+                    output += "\t\t}";
+
+                }
+
+                output += "\n";
+                output += "\t]";
+            }
+
+
+
+            if (animations.Count < 1)
+            {
+                output += "\n";
+            }
+            else
+            {
+                output += ",\n";
+
+                output += "\t\"animations\": [\n";
+
+                foreach (AnimationSequence a in animations)
+                {
+                    output += "\t\t{\n";
+                    output += "\t\t\t\"label\": \"" + a.Label + "\",\n";
+                    output += "\t\t\t\"loop_frame\": " + a.LoopToFrame.ToString() + ",\n";
+                    output += "\t\t\t\"frames\": [\n";
+                    
+                    foreach (AnimationCel c in a)
+                    {
+                        output += "\t\t\t\t{\n";
+                        output += "\t\t\t\t\t\"delay\": " + c.TimeDelay.ToString() + ",\n";
+                        output += "\t\t\t\t\t\"metasprite\": \"" + metaSprites[c.MetaSpriteIndex].Label + "\"\n";
+
+                        if (a.IndexOf(c) == a.Count - 1)
+                            output += "\t\t\t\t}\n";
+                        else
+                            output += "\t\t\t\t},\n";
+                    }
+
+                    output += "\t\t\t]\n";
+
+                    if (animations.IndexOf(a) == animations.Count - 1)
+                        output += "\t\t}\n";
+                    else
+                        output += "\t\t},\n";
+                }
+
+                output += "\t]\n";
+
+            }
+
+            output += "}";
+
+            byte[] bytes = Encoding.ASCII.GetBytes(output);
+
+            File.WriteAllBytes(fileName, bytes);
+        }
+
+        private void exportAnimationToCDialog_FileOk(object sender, CancelEventArgs e)
+        {
+            string fileName = exportAnimationToCDialog.FileName;
+
+            string animation_label = Path.GetFileNameWithoutExtension(fileName);
+
+            string output = "#ifndef NESAC_MACROS\n";
+            output += "#define NESAC_MACROS\n";
+            output += "#define NESAC_LOBYTE(p) (((unsigned int) (p)) & 0xff)\n";
+            output += "#define NESAC_HIBYTE(p) (((unsigned int) (p)) >> 8)\n";
+            output += "#endif\n\n";
+
+            if (metaSprites.Count > 0)
+            {
+                output += "const unsigned char " + animation_label + "_metasprite_offset[]={\n";
+                output += "\t" + metaSprite_offset_X.ToString() + ", " + metaSprite_offset_Y.ToString() + "\n}\n\n";
+
+                string ms_list = "const unsigned char* const " + animation_label + "_metasprite_list[]={\n";
+
+                foreach (MetaSprite ms in metaSprites)
+                {
+
+                    if (ms.Count < 1)
+                        continue;
+
+                    if (metaSprites.IndexOf(ms) > 0)
+                        ms_list += ",\n";
+
+                    output += "const unsigned char " + metaSprites[ms.Index].Label + "[]={\n";
+
+                    foreach (OamEntry oam in ms)
+                    {
+                        output += "\t";
+                        output += oam.X.ToString() + ", ";
+                        output += oam.Y.ToString() + ", ";
+                        output += String.Format("0x{0:x2}", oam.Char) + ", ";
+                        output += oam.Attribute.ToString() + ", ";
+                        output += "\n";
+                    }
+
+                    output += "\t128\n";
+                    output += "};\n\n";
+
+                    ms_list += "\t" + metaSprites[ms.Index].Label;
+                }
+
+                ms_list += "\n};\n\n";
+                
+                output += ms_list;
+                //output += "const unsigned char " + animation_label + "_metasprite_offset[]={\n";
+                //output += "\t" + metaSprite_offset_X.ToString() + ", " + metaSprite_offset_Y.ToString() + "\n}\n\n";
+            }
+
+
+            if (animations.Count > 0)
+            {
+
+                string a_list = "const unsigned char* const " + animation_label + "[]={\n";
+
+                foreach (AnimationSequence a in animations)
+                {
+                    output += "const unsigned char " + a.Label + "[]={\n";
+                    output += "\t" + a.LoopToFrame.ToString() + ",\t// index of frame to loop to.\n";
+
+                    foreach (AnimationCel c in a)
+                    {
+                        output += "\t" + c.TimeDelay.ToString() + ",\t// time delay for this frame.\n";
+                        output += "\tNESAC_LOBYTE(&" + metaSprites[c.MetaSpriteIndex].Label + "),\n";
+                        output += "\tNESAC_HIBYTE(&" + metaSprites[c.MetaSpriteIndex].Label + ")";
+
+                        if (a.IndexOf(c) < a.Count - 1)
+                            output += ",\n";
+                        else
+                            output += "\n";
+                    }
+
+                    output += "};\n\n";
+
+                    a_list += "\tNESAC_LOBYTE(&" + a.Label + "),\n";
+                    a_list += "\tNESAC_HIBYTE(&" + a.Label + ")";
+
+                    if (animations.IndexOf(a) < animations.Count - 1)
+                        a_list += ",\n";
+                    else
+                        a_list += "\n";
+                }
+
+                a_list += "};\n\n";
+                output += a_list;
+            }
+
+            byte[] bytes = Encoding.ASCII.GetBytes(output);
+
+            File.WriteAllBytes(fileName, bytes);
+
+        }
+
         private void pctPalette0Box_MouseDown(object sender, MouseEventArgs e)
         {
             if(e.Button == MouseButtons.Left)
             {
-                renderChrTable(0);
+                chrTablePaletteSelection = 0;
+                renderChrTable();
             }
         }
 
@@ -1374,7 +1604,8 @@ namespace NESAC
         {
             if (e.Button == MouseButtons.Left)
             {
-                renderChrTable(1);
+                chrTablePaletteSelection = 1;
+                renderChrTable();
             }
         }
 
@@ -1382,7 +1613,8 @@ namespace NESAC
         {
             if (e.Button == MouseButtons.Left)
             {
-                renderChrTable(2);
+                chrTablePaletteSelection = 2;
+                renderChrTable();
             }
         }
 
@@ -1390,7 +1622,8 @@ namespace NESAC
         {
             if (e.Button == MouseButtons.Left)
             {
-                renderChrTable(3);
+                chrTablePaletteSelection = 3;
+                renderChrTable();
             }
         }
 
@@ -1471,6 +1704,39 @@ namespace NESAC
             e.Graphics.DrawString(listBox.Items[e.Index].ToString(), e.Font, selected_font_color, e.Bounds, StringFormat.GenericDefault);
             // If the ListBox has focus, draw a focus rectangle around the selected item.
             e.DrawFocusRectangle();
+        }
+
+        private void chk8x16Mode_CheckedChanged(object sender, EventArgs e)
+        {
+            chr8x16Mode = chk8x16Mode.Checked;
+
+            renderMetasprite();
+            renderSelectedAnimation();
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            tmrAnimationTimer.Interval = (int)numericUpDown1.Value;
+        }
+
+        private void chkChrTableA_Click(object sender, EventArgs e)
+        {
+            chkChrTableB.Enabled = true;
+            chkChrTableB.Focus();
+            chkChrTableB.Checked = false;
+            chkChrTableA.Enabled = false;
+
+            renderChrTable();
+        }
+
+        private void chkChrTableB_Click(object sender, EventArgs e)
+        {
+            chkChrTableA.Enabled = true;
+            chkChrTableA.Focus();
+            chkChrTableA.Checked = false;
+            chkChrTableB.Enabled = false;
+            
+            renderChrTable();
         }
     }
 }

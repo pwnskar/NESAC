@@ -30,7 +30,7 @@ namespace NESAC
             this.Label = label;
         }
 
-        public Bitmap GetBitmap(NESPalette nesPalette, PaletteSelection paletteSelection, ChrTable chrTable)
+        public Bitmap GetBitmap(NESPalette nesPalette, PaletteSelection paletteSelection, ChrTable chrTable, bool chr8x16)
         {
             Bitmap bm = new Bitmap(128, 128);
             Graphics g = Graphics.FromImage(bm);
@@ -40,7 +40,7 @@ namespace NESAC
             {
                 OamEntry o = this[i];
 
-                Bitmap b = chrTable.GetBitmap(o.Char, paletteSelection[o.GetPaletteIndex()], nesPalette);
+                Bitmap b = chrTable.GetBitmap(o.Char, paletteSelection[o.GetPaletteIndex()], nesPalette, chr8x16);
                 if (o.VerticalIsFlipped())
                 {
                     b.RotateFlip(RotateFlipType.RotateNoneFlipY);

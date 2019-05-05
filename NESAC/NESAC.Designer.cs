@@ -52,6 +52,8 @@
             this.saveMetaspriteLabelsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportAnimationsAsasmToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportAnimationsAsJSONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportAnimationsAsCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openChrFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.openPalFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.openMsbFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -82,10 +84,13 @@
             this.nudCelDefaultTimeDelay = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.btnEditMetasprite = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.chkChrTableB = new System.Windows.Forms.CheckBox();
             this.pctFullPaletteBox = new System.Windows.Forms.PictureBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.chk8x16Mode = new System.Windows.Forms.CheckBox();
             this.txtMetaspriteNameBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.pctPalette0Box = new System.Windows.Forms.PictureBox();
@@ -98,6 +103,10 @@
             this.saveSessionDialog = new System.Windows.Forms.SaveFileDialog();
             this.openSessionDialog = new System.Windows.Forms.OpenFileDialog();
             this.exportAnimationToAsmDialog = new System.Windows.Forms.SaveFileDialog();
+            this.chkChrTableA = new System.Windows.Forms.CheckBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.exportAnimationToJsonDialog = new System.Windows.Forms.SaveFileDialog();
+            this.exportAnimationToCDialog = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.pctChrTableBox)).BeginInit();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pctMetaspriteBox)).BeginInit();
@@ -106,6 +115,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudLoopToFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudCelDefaultTimeDelay)).BeginInit();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pctFullPaletteBox)).BeginInit();
             this.groupBox3.SuspendLayout();
@@ -282,7 +292,9 @@
             // toolsToolStripMenuItem
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exportAnimationsAsasmToolStripMenuItem});
+            this.exportAnimationsAsasmToolStripMenuItem,
+            this.exportAnimationsAsJSONToolStripMenuItem,
+            this.exportAnimationsAsCToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
@@ -294,6 +306,20 @@
             this.exportAnimationsAsasmToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.exportAnimationsAsasmToolStripMenuItem.Text = "Export animations as *.asm";
             this.exportAnimationsAsasmToolStripMenuItem.Click += new System.EventHandler(this.exportAnimationsAsasmToolStripMenuItem_Click);
+            // 
+            // exportAnimationsAsJSONToolStripMenuItem
+            // 
+            this.exportAnimationsAsJSONToolStripMenuItem.Name = "exportAnimationsAsJSONToolStripMenuItem";
+            this.exportAnimationsAsJSONToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.exportAnimationsAsJSONToolStripMenuItem.Text = "Export animations as JSON";
+            this.exportAnimationsAsJSONToolStripMenuItem.Click += new System.EventHandler(this.exportAnimationsAsJSONToolStripMenuItem_Click);
+            // 
+            // exportAnimationsAsCToolStripMenuItem
+            // 
+            this.exportAnimationsAsCToolStripMenuItem.Name = "exportAnimationsAsCToolStripMenuItem";
+            this.exportAnimationsAsCToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.exportAnimationsAsCToolStripMenuItem.Text = "Export animations as C";
+            this.exportAnimationsAsCToolStripMenuItem.Click += new System.EventHandler(this.exportAnimationsAsCToolStripMenuItem_Click);
             // 
             // openChrFileDialog
             // 
@@ -577,6 +603,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.numericUpDown1);
             this.groupBox1.Controls.Add(this.btnEditMetasprite);
             this.groupBox1.Controls.Add(this.pctAnimationBox);
             this.groupBox1.Controls.Add(this.nudCelDefaultTimeDelay);
@@ -601,6 +628,31 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Animations";
             // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Enabled = false;
+            this.numericUpDown1.Location = new System.Drawing.Point(185, 19);
+            this.numericUpDown1.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(66, 20);
+            this.numericUpDown1.TabIndex = 36;
+            this.numericUpDown1.Value = new decimal(new int[] {
+            8,
+            0,
+            0,
+            0});
+            this.numericUpDown1.Visible = false;
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            // 
             // btnEditMetasprite
             // 
             this.btnEditMetasprite.Enabled = false;
@@ -614,13 +666,28 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.chkChrTableB);
             this.groupBox2.Controls.Add(this.pctChrTableBox);
             this.groupBox2.Location = new System.Drawing.Point(8, 29);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(266, 279);
+            this.groupBox2.Size = new System.Drawing.Size(336, 279);
             this.groupBox2.TabIndex = 39;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Tileset";
+            // 
+            // chkChrTableB
+            // 
+            this.chkChrTableB.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkChrTableB.AutoSize = true;
+            this.chkChrTableB.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.chkChrTableB.Location = new System.Drawing.Point(300, 42);
+            this.chkChrTableB.Name = "chkChrTableB";
+            this.chkChrTableB.Size = new System.Drawing.Size(30, 23);
+            this.chkChrTableB.TabIndex = 47;
+            this.chkChrTableB.Text = " B ";
+            this.chkChrTableB.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.chkChrTableB.UseVisualStyleBackColor = true;
+            this.chkChrTableB.Click += new System.EventHandler(this.chkChrTableB_Click);
             // 
             // pctFullPaletteBox
             // 
@@ -634,6 +701,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.chk8x16Mode);
             this.groupBox3.Controls.Add(this.txtMetaspriteNameBox);
             this.groupBox3.Controls.Add(this.pctMetaspriteBox);
             this.groupBox3.Controls.Add(this.btnPrevCel);
@@ -648,6 +716,20 @@
             this.groupBox3.TabIndex = 40;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Metasprites";
+            // 
+            // chk8x16Mode
+            // 
+            this.chk8x16Mode.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chk8x16Mode.AutoSize = true;
+            this.chk8x16Mode.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.chk8x16Mode.Location = new System.Drawing.Point(73, 310);
+            this.chk8x16Mode.Name = "chk8x16Mode";
+            this.chk8x16Mode.Size = new System.Drawing.Size(40, 23);
+            this.chk8x16Mode.TabIndex = 45;
+            this.chk8x16Mode.Text = "8x16";
+            this.chk8x16Mode.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.chk8x16Mode.UseVisualStyleBackColor = true;
+            this.chk8x16Mode.CheckedChanged += new System.EventHandler(this.chk8x16Mode_CheckedChanged);
             // 
             // txtMetaspriteNameBox
             // 
@@ -752,11 +834,49 @@
             this.exportAnimationToAsmDialog.Filter = "Assembly files|*.asm|All files|*.*";
             this.exportAnimationToAsmDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.exportAnimationToAsmDialog_FileOk);
             // 
+            // chkChrTableA
+            // 
+            this.chkChrTableA.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkChrTableA.AutoSize = true;
+            this.chkChrTableA.Checked = true;
+            this.chkChrTableA.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkChrTableA.Enabled = false;
+            this.chkChrTableA.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.chkChrTableA.Location = new System.Drawing.Point(274, 71);
+            this.chkChrTableA.Name = "chkChrTableA";
+            this.chkChrTableA.Size = new System.Drawing.Size(30, 23);
+            this.chkChrTableA.TabIndex = 46;
+            this.chkChrTableA.Text = " A ";
+            this.chkChrTableA.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.chkChrTableA.UseVisualStyleBackColor = true;
+            this.chkChrTableA.Click += new System.EventHandler(this.chkChrTableA_Click);
+            // 
+            // label3
+            // 
+            this.label3.Location = new System.Drawing.Point(272, 45);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(71, 23);
+            this.label3.TabIndex = 46;
+            this.label3.Text = "Pattern table:";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // exportAnimationToJsonDialog
+            // 
+            this.exportAnimationToJsonDialog.Filter = "JSON files|*.json|All files|*.*";
+            this.exportAnimationToJsonDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.exportAnimationToJsonDialog_FileOk);
+            // 
+            // exportAnimationToCDialog
+            // 
+            this.exportAnimationToCDialog.Filter = "C files|*.c|All files|*.*";
+            this.exportAnimationToCDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.exportAnimationToCDialog_FileOk);
+            // 
             // NESAC
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(621, 763);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.chkChrTableA);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
@@ -780,7 +900,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudCelDefaultTimeDelay)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pctFullPaletteBox)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -864,6 +986,15 @@
         private System.Windows.Forms.ToolStripMenuItem exportAnimationsAsasmToolStripMenuItem;
         private System.Windows.Forms.SaveFileDialog exportAnimationToAsmDialog;
         private System.Windows.Forms.Button btnEditMetasprite;
+        private System.Windows.Forms.CheckBox chk8x16Mode;
+        private System.Windows.Forms.CheckBox chkChrTableA;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox chkChrTableB;
+        private System.Windows.Forms.ToolStripMenuItem exportAnimationsAsJSONToolStripMenuItem;
+        private System.Windows.Forms.SaveFileDialog exportAnimationToJsonDialog;
+        private System.Windows.Forms.ToolStripMenuItem exportAnimationsAsCToolStripMenuItem;
+        private System.Windows.Forms.SaveFileDialog exportAnimationToCDialog;
     }
 }
 
