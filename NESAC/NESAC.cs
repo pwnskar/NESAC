@@ -25,7 +25,8 @@ namespace NESAC
         private int metaSpriteBitmapX = 256;
         private int metaSpriteBitmapY = 256;
 
-        public ChrTable chrTables = new ChrTable();
+        public ChrRom[] chrRoms = new ChrRom[256];
+        
         public NESPalette nesPalette = new NESPalette();
         public PaletteSelection paletteSelection = new PaletteSelection();
         private int chrTablePaletteSelection = 0;
@@ -122,6 +123,11 @@ namespace NESAC
             pctFullPaletteBox.Image = nesPalette.GetFullPaletteAsBitmap();
 
             renderPaletteSelection();
+
+            for (int i = 0; i < 256; i++)
+            {
+                chrRoms[i] = new ChrRom();
+            }
 
             updateRenders();
         }
@@ -222,7 +228,7 @@ namespace NESAC
 
             byte[] chrBytes = File.ReadAllBytes(fileName);
 
-            chrTables.LoadA(chrBytes);
+            chrRoms[(int)nudChrRom.Value].LoadA(chrBytes);
 
             this.Session.ChrTableFilenameA = fileName;
 
@@ -236,7 +242,7 @@ namespace NESAC
 
             byte[] chrBytes = File.ReadAllBytes(fileName);
 
-            chrTables.LoadB(chrBytes);
+            chrRoms[(int)nudChrRom.Value].LoadB(chrBytes);
 
             this.Session.ChrTableFilenameB = fileName;
 
@@ -351,7 +357,7 @@ namespace NESAC
 
         private void renderChrTable(int paletteSelectionIndex)
         {
-            if (chrTables.Count < 256)
+            if (chrRoms[(int)nudChrRom.Value].Count < 256)
                 return;
 
             Bitmap chrBitmapA = new Bitmap(128, 128);
@@ -375,10 +381,12 @@ namespace NESAC
                 }
 
 
-                Bitmap b = chrTables.GetBitmap(chrIndex, paletteSelection[paletteSelectionIndex], nesPalette, false);
+                Bitmap b = chrRoms[(int)nudChrRom.Value].GetBitmap(chrIndex, paletteSelection[paletteSelectionIndex], nesPalette, false);
                 chrIndex++;
 
                 g.DrawImage(b, x_pos, y_pos);
+
+                //g.DrawLine(
 
 
                 x_pos += 8;
@@ -423,7 +431,7 @@ namespace NESAC
             {
                 OamEntry o = metaSprite[i];
 
-                Bitmap b = chrTables.GetBitmap(o.Char, paletteSelection[o.GetPaletteIndex()], nesPalette, chr8x16Mode);
+                Bitmap b = chrRoms[0].GetBitmap(o.Char, paletteSelection[o.GetPaletteIndex()], nesPalette, chr8x16Mode);
                 if (o.VerticalIsFlipped())
                 {
                     b.RotateFlip(RotateFlipType.RotateNoneFlipY);
@@ -569,6 +577,8 @@ namespace NESAC
                     loop_max = 0;
 
                 int loop_to_frame = animations[SelAnimation].LoopToFrame;
+                if (loop_to_frame > loop_max)
+                    loop_to_frame = loop_max;
 
                 nudLoopToFrame.Maximum = loop_max;
 
@@ -880,7 +890,7 @@ namespace NESAC
                 if (animation.Count > 0)
                 {
                     AnimationCel ac = animation[SelAnimationCel];
-                    celBitmap = metaSprites[ac.MetaSpriteIndex].GetBitmap(nesPalette, paletteSelection, chrTables, chr8x16Mode);
+                    celBitmap = metaSprites[ac.MetaSpriteIndex].GetBitmap(nesPalette, paletteSelection, chrRoms[0], chr8x16Mode);
                 }
                 else
                 {
@@ -1736,6 +1746,11 @@ namespace NESAC
             chkChrTableA.Checked = false;
             chkChrTableB.Enabled = false;
             
+            renderChrTable();
+        }
+
+        private void nudChrRom_ValueChanged(object sender, EventArgs e)
+        {
             renderChrTable();
         }
     }

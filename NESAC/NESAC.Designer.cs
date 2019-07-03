@@ -87,6 +87,8 @@
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.btnEditMetasprite = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.nudChrRom = new System.Windows.Forms.NumericUpDown();
             this.chkChrTableB = new System.Windows.Forms.CheckBox();
             this.pctFullPaletteBox = new System.Windows.Forms.PictureBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -117,6 +119,7 @@
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudChrRom)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pctFullPaletteBox)).BeginInit();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pctPalette0Box)).BeginInit();
@@ -153,7 +156,7 @@
             this.toolsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(621, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(624, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -550,6 +553,7 @@
             this.nudCelTimeDelay.Name = "nudCelTimeDelay";
             this.nudCelTimeDelay.Size = new System.Drawing.Size(66, 20);
             this.nudCelTimeDelay.TabIndex = 30;
+            this.nudCelTimeDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.nudCelTimeDelay.ValueChanged += new System.EventHandler(this.nudCelTimeDelay_ValueChanged);
             // 
             // nudLoopToFrame
@@ -563,6 +567,7 @@
             this.nudLoopToFrame.Name = "nudLoopToFrame";
             this.nudLoopToFrame.Size = new System.Drawing.Size(66, 20);
             this.nudLoopToFrame.TabIndex = 31;
+            this.nudLoopToFrame.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.nudLoopToFrame.ValueChanged += new System.EventHandler(this.nudLoopToFrame_ValueChanged);
             // 
             // label5
@@ -585,6 +590,7 @@
             this.nudCelDefaultTimeDelay.Name = "nudCelDefaultTimeDelay";
             this.nudCelDefaultTimeDelay.Size = new System.Drawing.Size(66, 20);
             this.nudCelDefaultTimeDelay.TabIndex = 32;
+            this.nudCelDefaultTimeDelay.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.nudCelDefaultTimeDelay.Value = new decimal(new int[] {
             1,
             0,
@@ -645,6 +651,7 @@
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(66, 20);
             this.numericUpDown1.TabIndex = 36;
+            this.numericUpDown1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.numericUpDown1.Value = new decimal(new int[] {
             8,
             0,
@@ -666,6 +673,8 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.label7);
+            this.groupBox2.Controls.Add(this.nudChrRom);
             this.groupBox2.Controls.Add(this.chkChrTableB);
             this.groupBox2.Controls.Add(this.pctChrTableBox);
             this.groupBox2.Location = new System.Drawing.Point(8, 29);
@@ -674,6 +683,29 @@
             this.groupBox2.TabIndex = 39;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Tileset";
+            // 
+            // label7
+            // 
+            this.label7.Location = new System.Drawing.Point(264, 68);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(71, 23);
+            this.label7.TabIndex = 47;
+            this.label7.Text = "CHR ROM:";
+            this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // nudChrRom
+            // 
+            this.nudChrRom.Location = new System.Drawing.Point(267, 94);
+            this.nudChrRom.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.nudChrRom.Name = "nudChrRom";
+            this.nudChrRom.Size = new System.Drawing.Size(66, 20);
+            this.nudChrRom.TabIndex = 37;
+            this.nudChrRom.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.nudChrRom.ValueChanged += new System.EventHandler(this.nudChrRom_ValueChanged);
             // 
             // chkChrTableB
             // 
@@ -874,7 +906,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(621, 763);
+            this.ClientSize = new System.Drawing.Size(624, 763);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.chkChrTableA);
             this.Controls.Add(this.groupBox4);
@@ -903,6 +935,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudChrRom)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pctFullPaletteBox)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -995,6 +1028,8 @@
         private System.Windows.Forms.SaveFileDialog exportAnimationToJsonDialog;
         private System.Windows.Forms.ToolStripMenuItem exportAnimationsAsCToolStripMenuItem;
         private System.Windows.Forms.SaveFileDialog exportAnimationToCDialog;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.NumericUpDown nudChrRom;
     }
 }
 
